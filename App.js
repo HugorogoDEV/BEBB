@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, Image, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
 import { saveLoginData, getLoginData } from './database';
+import SQLite from 'react-native-sqlite-storage';
 
 export const HomeScreen = ({}) => {
 
@@ -51,6 +52,45 @@ export const HomeScreen = ({}) => {
       </View>
     </View>
   );
+};
+
+
+const db = SQLite.openDatabase(
+  { name: 'MainDB', location: 'default' },
+  () => {},
+  error => console.log(error),
+);
+
+db.transaction((tx) => {
+  tx.executeSql(
+    'CREATE TABLE IF NOT EXISTS Person (id INTEGER PRIMARY KEY AUTOINCRENT, name TEXT, age INTEGER, height FLOAT, weight FLOAT)',
+  );
+});
+
+const insertPerson = (name, age, height, weight) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'INSERT INTO Person (name, age, height, weight) VALUES (?, ?, ?, ?)',
+      [name, age, height, weight],
+    );
+  });
+};
+
+const updatePerson = (id, name, age, height, weight) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'UPDATE Person SET name=?, age=?, height=?, weight=?, WHERE id=?',
+      [name, age, height, weight, id],
+    );
+  });
+};
+
+const getPersons = (callback) => {
+  db.transaction((tx) => {
+    tx.executeSql('SELECT * FROM Person', [], (_, results) => {
+      callback(results.rows.raw());
+    });
+  });
 };
 
 const width = Dimensions.get('screen').width;
