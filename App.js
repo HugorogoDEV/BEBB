@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Text, View, Image, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
-import { saveLoginData, getLoginData } from './database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { grafico } from './chart';
 
 export const HomeScreen = ({ }) => {
 
@@ -25,6 +26,13 @@ export const HomeScreen = ({ }) => {
     } catch (error) {
       Alert.alert('There was an error saving the data.');
     }
+  };
+
+  const handlePress = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'grafico' }],
+    });
   };
 
   return (
@@ -55,7 +63,7 @@ export const HomeScreen = ({ }) => {
               </View>
             </View>
             <View style={styles.container}>
-              <TouchableOpacity style={[styles.button, styles.centralizar]} onPress={saveData}>
+              <TouchableOpacity style={[styles.button, styles.centralizar]} onPress={[saveData, handlePress]}>
                 <Text style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>Salvar</Text>
               </TouchableOpacity>
             </View>
