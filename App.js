@@ -1,38 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { grafico } from './chart';
 
-export const HomeScreen = ({ }) => {
-
-  const [nome, setnome] = useState('');
+export const HomeScreen = () => {
+  const [inputText, setInputText] = useState(''); // For managing the input text
+  const [storedText, setStoredText] = useState(''); // To display the retrieved value
   const [dose, setdose] = useState('');
-  const [input1, setInput1] = useState('');
-  const [input2, setInput2] = useState('');
-  const [input3, setInput3] = useState('');
-  const [input4, setInput4] = useState('');
+  const [idade, setIdade] = useState('');
+  const [peso, setPeso] = useState('');
+  const [altura, setAltura] = useState('');
+  const [sexo, setSexo] = useState('');
 
-  // Função para segurar a ação de salvar
-  const saveData = async () => {
+
+  const handleSave = async () => {
     try {
-      await AsyncStorage.setItem('input1', input1);
-      await AsyncStorage.setItem('input2', input2);
-      await AsyncStorage.setItem('input3', input3);
-      await AsyncStorage.setItem('input4', input4);
-      await AsyncStorage.setItem('nome', nome);
-      await AsyncStorage.setItem('dose', dose);
-      console.log(nome)
+      await AsyncStorage.setItem('my_key', JSON.stringify(inputText));
+      await AsyncStorage.setItem('dose', JSON.stringify(dose));
+      await AsyncStorage.setItem('idade', JSON.stringify(idade));
+      await AsyncStorage.setItem('peso', JSON.stringify(peso));
+      await AsyncStorage.setItem('altura', JSON.stringify(altura));
+      await AsyncStorage.setItem('sexo', JSON.stringify(sexo));
+      console.log(inputText);
     } catch (error) {
-      Alert.alert('There was an error saving the data.');
+      console.error("Error saving data", error);
     }
   };
 
-  const handlePress = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'grafico' }],
-    });
+  const handleRetrieve = async () => {
+    try {
+      const value = await AsyncStorage.getItem('my_key');
+      const value1 = await AsyncStorage.getItem('dose');
+      const value2 = await AsyncStorage.getItem('idade');
+      const value3 = await AsyncStorage.getItem('peso');
+      const value4 = await AsyncStorage.getItem('altura');
+      const value5 = await AsyncStorage.getItem('sexo');
+      if (value !== null) {
+        setStoredText(JSON.parse(value));
+        console.log(value);
+        console.log(value1);
+        console.log(value2);
+        console.log(value3);
+        console.log(value4);
+        console.log(value5);
+      }
+    } catch (error) {
+      console.error("Error retrieving data", error);
+    }
   };
 
   return (
@@ -41,8 +54,8 @@ export const HomeScreen = ({ }) => {
         <View style={styles.fileira}>
           <View style={styles.colunaTopo}>
             <View style={styles.container}><Text style={styles.titulo}>Bora {'\n'}Bebber </Text></View>
-            <View style={styles.container}><Text style={styles.subTitulo}>Como quer{'\n'}ser chamado?</Text><TextInput onChangeText={(text) => setnome(text)} placeholderTextColor="blue" placeholder="Seu Nome" /></View>
-            <View style={styles.container}><Text style={[styles.subTitulo]}>Quanto de água{'\n'}vai tomar{'\n'}por dose?</Text><TextInput onChangeText={(text) => setdose(text)} placeholderTextColor='blue' placeholder='300ml' /></View>
+            <View style={styles.container}><Text style={styles.subTitulo}>Como quer{'\n'}ser chamado?</Text><TextInput  value={inputText} onChangeText={setInputText} placeholder="Type something"/></View>
+            <View style={styles.container}><Text style={[styles.subTitulo]}>Quanto de água{'\n'}vai tomar{'\n'}por dose?</Text><TextInput value={dose} onChangeText={setdose} placeholderTextColor='blue' placeholder='300ml' /></View>
           </View>
           <View style={styles.colunaTopo}>
             <View style={[styles.container, styles.centralizar]}><Text style={styles.inputSubTitulo}>Precisamos{'\n'}de alguns dados{'\n'}para começarmos{'\n'}anos hidratar</Text></View>
@@ -50,20 +63,23 @@ export const HomeScreen = ({ }) => {
               <View style={styles.fileira}>
                 <View style={styles.coluna}>
                   <Text style={[styles.subTitulo, styles.input]}>Idade</Text>
-                  <TextInput onChangeText={(text) => setInput1(text)} placeholder='input1' />
+                  <TextInput value={idade} onChangeText={setIdade} placeholder='idade' />
                   <Text style={[styles.subTitulo, styles.input]}>Peso</Text>
-                  <TextInput onChangeText={(text) => setInput2(text)} placeholder='input2' />
+                  <TextInput value={peso} onChangeText={setPeso} placeholder='peso' />
                 </View>
                 <View style={styles.coluna}>
                   <Text style={[styles.subTitulo, styles.input]}>Altura</Text>
-                  <TextInput onChangeText={(text) => setInput3(text)} placeholder='input3' />
+                  <TextInput value={altura} onChangeText={setAltura} placeholder='1,83 m' />
                   <Text style={[styles.subTitulo, styles.input]}>Sexo</Text>
-                  <TextInput onChangeText={(text) => setInput4(text)} placeholder='input4' />
+                  <TextInput value={sexo} onChangeText={setSexo} placeholder='masculino' />
                 </View>
               </View>
             </View>
             <View style={styles.container}>
-              <TouchableOpacity style={[styles.button, styles.centralizar]} onPress={[saveData, handlePress]}>
+              <TouchableOpacity style={[styles.button, styles.centralizar]} onPress={handleSave}>
+                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>Salvar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.centralizar]} onPress={handleRetrieve}>
                 <Text style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>Salvar</Text>
               </TouchableOpacity>
             </View>
